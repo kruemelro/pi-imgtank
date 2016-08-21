@@ -1,0 +1,12 @@
+[Unit]
+Description=Change status of HAT-LEDs
+After=multi-user.target
+ 
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/sbin/hatctl.py BE
+ExecStop=/usr/local/sbin/hatctl.py HS
+
+[Install]
+WantedBy=multi-user.target

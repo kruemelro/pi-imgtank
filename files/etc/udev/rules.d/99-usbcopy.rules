@@ -1,0 +1,1 @@
+KERNEL=="sd?", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/usr/local/sbin/copy_img $kernel"

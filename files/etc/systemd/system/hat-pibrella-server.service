@@ -1,0 +1,13 @@
+[Unit]
+Description=Start HAT-server for pibrella
+DefaultDependencies=no
+After=sysinit.target local-fs.target
+Before=basic.target
+ 
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/hat-pibrella-server.py
+ExecStartPost=/usr/local/sbin/hatctl.py BS
+
+[Install]
+WantedBy=basic.target

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+DEBUG=1
+# Target backup-directory: change to your needs!
+BACKUP_DIR="/data/images"
+
+# query udev argument
+device="$1"
+logger -t copy_img "checking: $1"
+model=$(</sys/block/$device/device/model)
+logger -t copy_img "model is: $model"
+
+# we just ignore sda because this should be our os and/or target harddisk
+# change this heuristic to your needs!
+
+[ "$device" = "sda" ] && exit 0
+
+# change state of HAT: Action Start
+/usr/local/sbin/hatctl.py AS
+
+# create BACKUP_DIR
+mkdir -p "$BACKUP_DIR"
+
+# create temporary mountdir, bail out on error
+mountdir=$(mktemp -d --tmpdir copy_img.XXXXXX)
+[ "$DEBUG" = "1" ] && logger -t copy_img "mountdir: $mountdir"
+[ -z "$mountdir" ] && exit 3
+
+# now mount and copy files
+if mount "/dev/${device}1" "$mountdir"; then
+  if [ -d "$mountdir/DCIM" ]; then
+    if [ "$DEBUG" = "1" ]; then
+      rsync -va --no-owner --modify-window=1 "$mountdir"/DCIM/*/* "$BACKUP_DIR" | \
+          logger -t copy_img
+    else
+      rsync -a --no-owner --modify-window=1 "$mountdir"/DCIM/*/* "$BACKUP_DIR"
+    fi
+  fi
+  umount "$mountdir"
+else
+  logger -t copy_img "mount of ${device}1 failed!"
+fi
+rm -fr "$mountdir"
+
+# change state of HAT: Action End
+/usr/local/sbin/hatctl.py AE
