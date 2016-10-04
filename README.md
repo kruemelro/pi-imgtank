@@ -87,7 +87,7 @@ There are two versions of the copy script: `copy_img` and `copy_img2`
 filenames while copying images, **you therefore risk data-loss if
 you reset the image-numbers within your camera or if you use
 multiple cameras which use the same naming-scheme!** Make sure that
-`/etc/udev/rules.d/99-usbcopy.rules" points to the correct script.
+`/etc/udev/rules.d/99-usbcopy.rules` points to the correct script.
 
 
 Operation
