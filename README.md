@@ -14,6 +14,7 @@ imagetank uses an extension board called "Pibrella", which is
 manufactured by Pimoroni. This board has a number of LEDs which we
 use to signal state and a button, which we use for shutdown.
 
+![Pi with Pibrella](images/pibrella.jpg "Pi with Pibrella")
 
 Basic installation
 ------------------
@@ -93,6 +94,12 @@ Insert a SDHC card from your digital camera into an USB-adapter and plug
 it into the Pi. The orange led should now start to blink slowly. After all
 files are copied, the led stops blinking and the green led comes on again.
 Now it is safe to remove the USB-adapter.
+
+The leds of the Pibrella hat always reflects the current state of the
+system. You can see a  graphical representation of the various states in
+the following image.
+
+![System states with transitions](images/states.png "System states with transitions")
 
 
 Automatic installation of Raspbian to a hard-disk
