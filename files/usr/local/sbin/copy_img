@@ -1,4 +1,21 @@
 #!/bin/bash
+# ---------------------------------------------------------------------------
+# This script is triggered by an udev-rule in /etc/udev/rules.d/99-usbcopy.rules.
+# It copies all images from a SD-card to the hard-disk.
+#
+# This is a simple version of the copy-script, it just copies the files
+# as is to BACKUP_DIR (which defaults to /data/images). The script uses
+# rsync to only copy files which are new or modified.
+#
+# Note that you risk loosing data if you reset image-numbers in your camera
+# or if you use multiple cameras which create identical filenames.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
 
 DEBUG=1
 # Target backup-directory: change to your needs!
