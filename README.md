@@ -16,6 +16,7 @@ use to signal state and a button, which we use for shutdown.
 
 ![Pi with Pibrella](images/pibrella.jpg "Pi with Pibrella")
 
+
 Basic installation
 ------------------
 
@@ -80,6 +81,13 @@ To activate these system-services, run the following commands:
 
     sudo systemctl enable endofboot.servcie
     sudo systemctl enable hat-pibrella-service
+
+There are two versions of the copy script: `copy_img` and `copy_img2`
+(the latter is work in progress). The first version does not change
+filenames while copying images, **you therefore risk data-loss if
+you reset the image-numbers within your camera or if you use
+multiple cameras which use the same naming-scheme!** Make sure that
+`/etc/udev/rules.d/99-usbcopy.rules" points to the correct script.
 
 
 Operation
