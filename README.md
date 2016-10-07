@@ -104,6 +104,7 @@ You can log into your system using ssh and see log-messages of the copy-script:
     sudo journalctl SYSLOG_IDENTIFIER=copy_img
 
 or
+
     sudo journalctl SYSLOG_IDENTIFIER=copy_img2
 
 (depending on which version of the copy-script you are using).
