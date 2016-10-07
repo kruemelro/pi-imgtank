@@ -9,6 +9,9 @@
 #   - only copies files not already copied
 #   - create thumbnails
 #
+# If DEBUG=1, messages go the the syslog. To view the messages, run
+#   sudo journalctl SYSLOG_IDENTIFIER=copy_img2
+#
 # Dependencies: GraphicsMagick
 #
 # Author: Bernhard Bablok
