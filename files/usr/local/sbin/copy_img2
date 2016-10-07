@@ -23,6 +23,7 @@
 setDefaults() {
   DEBUG=1                               # writes to syslog if set to 1
   DATA_ROOT="/data"                     # Root of data/backup-directory
+  DATA_OWNER="pi:pi"                    # uid:gid of data-owner
   IMAGE_ROOT="$DATA_ROOT/images"        # Root of image-directory
   THUMB_ROOT="$DATA_ROOT/thumbnails"    # Root of thumbs-directory
   THUMB_SIZE="256x256"
@@ -76,10 +77,16 @@ prepareSystem() {
   /usr/local/sbin/hatctl.py AS
 
   # create IMAGE_ROOT (if it does not exist)
-  mkdir -p "$IMAGE_ROOT"
+  if [ ! -d "$IMAGE_ROOT" ]; then
+    mkdir -p "$IMAGE_ROOT"
+    chown "$DATA_OWNER" "$IMAGE_ROOT"
+  fi
 
   # create THUMB_ROOT (if it does not exist)
-  mkdir -p "$THUMB_ROOT"
+  if [ ! -d "$THUMB_ROOT" ]; then
+    mkdir -p "$THUMB_ROOT"
+    chown "$DATA_OWNER" "$THUMB_ROOT"
+  fi
 
   # create mount-directory for SD-card
   mountdir="$DATA_ROOT/mnt_sd"
@@ -112,6 +119,7 @@ createThumb() {
   local target="$THUMB_ROOT/$1"
   gm convert -size "$THUMB_SIZE" "$src" -resize "$THUMB_SIZE" \
                                                        +profile "*" "$target"
+  chown "$DATA_OWNER" "$target"
 }
 
 # --- copy all images   ----------------------------------------------------
@@ -136,8 +144,12 @@ copyFiles() {
 
       # query date of current image and create target directory
       local imgDate=$(date -r "$img" '+%Y%m%d')
-      mkdir -p "$IMAGE_ROOT/$imgDate"
-      mkdir -p "$THUMB_ROOT/$imgDate"
+      if [ ! -d "$IMAGE_ROOT/$imgDate" ]; then
+        mkdir -p "$IMAGE_ROOT/$imgDate"
+        chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate"
+        mkdir -p "$THUMB_ROOT/$imgDate"
+        chown "$DATA_OWNER" "$THUMB_ROOT/$imgDate"
+      fi
 
       # get stem of target filename
       targetStem=$(nextNumber)
@@ -149,6 +161,7 @@ copyFiles() {
     msg "copying $img to $IMAGE_ROOT/$imgDate/$targetStem.$ext"
     cp -a "$img" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
     chmod -wx "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
 
     # create thumbnail
     [ "$ext" = "jpg" ] && createThumb "$imgDate/$targetStem.$ext"
