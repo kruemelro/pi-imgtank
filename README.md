@@ -61,6 +61,16 @@ details, see below (section "Automatic installation of Raspbian
 to a hard-disk").
 
 
+Install Pibrella support library
+--------------------------------
+
+To install the python library for Pibrella run the following commands:
+
+    sudo apt-get update
+    sudo apt-get install python-pip
+    sudo pip install pibrella
+
+
 Install specific imagetank files
 --------------------------------
 
