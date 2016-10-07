@@ -1,0 +1,171 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script is triggered by an udev-rule in /etc/udev/rules.d/99-usbcopy.rules.
+# It copies all images from a SD-card to the hard-disk.
+#
+# Special features:
+#   - rename files to a unique ID: pii123456.*
+#   - copies to subdirs per day
+#   - only copies files not already copied
+#   - create thumbnails
+#
+# Dependencies: GraphicsMagick
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+# --- global settings   -----------------------------------------------------
+
+setDefaults() {
+  DEBUG=1                               # writes to syslog if set to 1
+  DATA_ROOT="/data"                     # Root of data/backup-directory
+  IMAGE_ROOT="$DATA_ROOT/images"        # Root of image-directory
+  THUMB_ROOT="$DATA_ROOT/thumbnails"    # Root of thumbs-directory
+  THUMB_SIZE="256x256"
+  IMG_PREFIX="pimg_"                    # prefix for all images
+}
+
+# --- write message to system log   -----------------------------------------
+
+msg() {
+  [ "$DEBUG" = "1" ] && logger -s -t copy_img2 "$1"
+}
+
+# --- get next image-number   -----------------------------------------------
+
+nextNumber() {
+  local nFile="$IMAGE_ROOT/.currentNumber"
+  declare -i cNum=-1
+
+  # if we have a number, use it (else use default of -1)
+  if [ -f "$nFile" ]; then
+    cNum=$(cat "$nFile")
+  fi
+
+  # increment number, save and return new value
+  let cNum+=1
+  echo "$cNum" > "$nFile"
+  echo "$IMG_PREFIX$(printf '%04g' $cNum)"
+}
+
+# --- check device   --------------------------------------------------------
+
+checkDevice() {
+  # query udev argument
+  device="$1"
+  msg "info: checking: $1"
+  model=$(</sys/block/$device/device/model)
+  msg "info: model is: $model"
+
+  # we just ignore sda because this should be our os and/or target harddisk
+  # change this heuristic to your needs!
+  if [ "$device" = "sda" ]; then
+    msg "info: ignoring device sda (probably no SD-card)"
+    exit 0
+  fi
+}
+
+# --- prepare system   -----------------------------------------------------
+
+prepareSystem() {
+  # change state of HAT: Action Start
+  /usr/local/sbin/hatctl.py AS
+
+  # create IMAGE_ROOT (if it does not exist)
+  mkdir -p "$IMAGE_ROOT"
+
+  # create THUMB_ROOT (if it does not exist)
+  mkdir -p "$THUMB_ROOT"
+
+  # create mount-directory for SD-card
+  mountdir="$DATA_ROOT/mnt_sd"
+  msg "mountdir: $mountdir"
+  mkdir -p "$mountdir"
+  
+  # try to mount SD-card
+  if ! mount "/dev/${device}1" "$mountdir"; then
+    msg "error: could not mount /dev/${device}1"
+    cleanup
+    exit 3
+  fi
+}
+
+# --- cleanup   -------------------------------------------------------------
+
+cleanup() {
+  # umount SD-card
+  msg "umounting mountdir: $mountdir"
+  grep -q "$mountdir" /etc/mtab && umount "$mountdir"
+
+  # change state of HAT: Action End
+  /usr/local/sbin/hatctl.py AE
+}
+
+# --- create thumbnail of a given image   ----------------------------------
+
+createThumb() {
+  local src="$IMAGE_ROOT/$1"
+  local target="$THUMB_ROOT/$1"
+  gm convert -size "$THUMB_SIZE" "$src" -resize "$THUMB_SIZE" \
+                                                       +profile "*" "$target"
+}
+
+# --- copy all images   ----------------------------------------------------
+
+copyFiles() {
+  # check if timestamp-file exists on SD-card. If not, create it
+  if [ ! -f "$mountdir/.last_img" ]; then
+    touch -d "01/01/1960" "$mountdir/.last_img"
+  fi
+
+  # find all files newer than .last_img on SD-card and copy it
+  local img srcStem srcStemNew targetStem ext
+  for img in $(find "$mountdir/DCIM" \
+                           -type f -newer "$mountdir/.last_img" | sort); do
+    msg "processing $img"
+
+    # check if we already copied a file with the same stem
+    local srcStemNew="${img%.*}"
+    if [ "$srcStem" != "$srcStemNew" ]; then
+      # make the new stem the current stem
+      srcStem="$srcStemNew"
+
+      # query date of current image and create target directory
+      local imgDate=$(date -r "$img" '+%Y%m%d')
+      mkdir -p "$IMAGE_ROOT/$imgDate"
+      mkdir -p "$THUMB_ROOT/$imgDate"
+
+      # get stem of target filename
+      targetStem=$(nextNumber)
+    fi
+
+    # now copy image
+    ext="${img##*.}"
+    ext="${ext,,}"        # convert to lowercase
+    msg "copying $img to $IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    cp -a "$img" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    chmod -wx "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+
+    # create thumbnail
+    [ "$ext" = "jpg" ] && createThumb "$imgDate/$targetStem.$ext"
+  done
+
+  # save timestamp of last copied image
+  if [ -f "$img" ]; then
+    touch -r "$img" "$mountdir/.last_img"
+  else
+    msg "no images to copy"
+  fi
+}
+
+# --- main program   ---------------------------------------------------------
+
+setDefaults
+checkDevice "$1"
+prepareSystem
+copyFiles
+cleanup
