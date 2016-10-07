@@ -17,62 +17,27 @@ use to signal state and a button, which we use for shutdown.
 ![Pi with Pibrella](images/pibrella.jpg "Pi with Pibrella")
 
 
-Basic installation
-------------------
+Installation
+------------
 
-Installation is quite simple. Grab the current version of
-Raspbian-Jessie-Lite and install it to an micro SDHC card. Configure
-the system to taste. Additionally install the package `rsync`:
+First, install your system as described in
+[Basic installation](./doc/basic_install.md "Basic installation"). This
+sets up your system and your HDD/SDD.
 
-    sudo apt-get update
-    sudo apt-get install rsync
-
-Then attach an external usb-disk, and execute the following command:
-
-    sudo fdisk /dev/sda
-
-If the disk is already partitioned, you should first delete all existing
-partitions. Use the `p`-command (`print`) to check for existing partitions
-and the `d`-command to delete them. Once the print-command does not show any
-partitions anymore, create a new one with `n`. You can accept all defaults,
-this will create a single partition which takes up all available
-space. Leave the fdisk-program with the `w`-command (`write`). This
-will erase all data already on the disk, so make sure you don't loose
-any important data.
-
-Next, you should format the partition, create a mount-point and
-mount the partition:
-
-    sudo mkfs.ext4 /dev/sda1
-    sudo mkdir /data
-    sudo mount /dev/sda1 /data
-
-All space is now available in the `/data`-directory. Since the mount
-is temporary, you should now open the file `/etc/fstab` with your
-favorite editor andd add the following line
-
-    /dev/sda1 /data ext4 user_xattr,noatime,acl 1 2
-
-Reboot and check with the `df`-command that the external drive is
-mounted and the space is available.
-
-If you are a Linux-user you can automate all the above steps. For
-details, see below (section "Automatic installation of Raspbian
-to a hard-disk").
-
-
-Install Pibrella support library
---------------------------------
-
-To install the python library for Pibrella run the following commands:
+Additionally install the following packages:
 
     sudo apt-get update
-    sudo apt-get install python-pip
+    sudo apt-get install rsync GraphicsMagick python-pip
+
+
+### Install Pibrella support library ###
+
+To install the python library for Pibrella run the following command:
+
     sudo pip install pibrella
 
 
-Install specific imagetank files
---------------------------------
+### Install specific imagetank files ###
 
 All necessary files are below the `files`-directory of this project.
 To copy the files, clone the project and copy the files:
@@ -92,13 +57,28 @@ To activate these system-services, run the following commands:
     sudo systemctl enable endofboot.servcie
     sudo systemctl enable hat-pibrella-service
 
-There are two versions of the copy script: `copy_img` and `copy_img2`
-(the latter is work in progress). The first version does not change
-filenames while copying images, **you therefore risk data-loss if
-you reset the image-numbers within your camera or if you use
-multiple cameras which use the same naming-scheme!** Make sure that
-`/etc/udev/rules.d/99-usbcopy.rules` points to the correct script.
+There are two versions of the copy script: `copy_img` and `copy_img2`.
+The first version does not change filenames while copying images,
+**you therefore risk data-loss if you reset the image-numbers within
+your camera or if you use multiple cameras which use the same
+naming-scheme!** Make sure that `/etc/udev/rules.d/99-usbcopy.rules`
+points to the correct script.
 
+
+### Web access to your images ###
+
+If you want to browse the images on the imagetank, you have to install
+a webserver on the system. You can find the necessary instructions
+in the document [Installing a Webserver](./doc/web_install.md 
+"Installing a Webserver").
+
+
+### Using the Imagetank as a Fileserver ###
+
+The imagetank is meant as a backup solution. In case you need to recover
+your files, a Samba-server comes in handy to access your images from
+any computer within your network. You can find a setup instruction
+[here](./doc/samba_install.md "Installing Samba").
 
 Operation
 ---------
@@ -119,30 +99,13 @@ the following image.
 
 ![System states with transitions](images/states.png "System states with transitions")
 
+You can log into your system using ssh and see log-messages of the copy-script:
 
-Automatic installation of Raspbian to a hard-disk
--------------------------------------------------
+    sudo journalctl SYSLOG_IDENTIFIER=copy_img
 
-The preparation of a hard-disk as described above is not very complicated,
-but it can be fully automated. As an added benefit, also the operating
-system runs from the disk. This will use the micro SDHC only for booting
-and will certainly extend the lifetime of the card.
+or
+    sudo journalctl SYSLOG_IDENTIFIER=copy_img2
 
-On a Linux sytem, download the git-project called `apiinst`
+(depending on which version of the copy-script you are using).
 
-    git clone https://github.com/bablokb/apiinst.git
 
-Now attach your micro SDHC card to your PC (we will assume it uses
-`/dev/sdb`) and then attach your hard-disk to the PC. In our example
-it will use `/dev/sdc`. Please make sure that these device names
-are correct, else you will risk loosing all your data on your PC. Existing
-data on the devices will always be deleted.
-
-To install Raspbian and prepare a data-partition on the disk, just run
-
-    sudo apiinst/bin/apiinst -i /path/to/20160527-raspbian-jessie-lite.zip \
-         -B /dev/sdb -t /dev/sdc -D 150G
-
-Adapt the size of the data-partition (option `-D`) to your needs. The
-command above will add all remaining space to the root-partition of the
-system.
