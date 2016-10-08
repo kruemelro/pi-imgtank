@@ -18,8 +18,8 @@
 # ---------------------------------------------------------------------------
 
 DEBUG=1
-# Target backup-directory: change to your needs!
-BACKUP_DIR="/data/images"
+BACKUP_DIR="/data/images"             # Target backup-directory
+DATA_OWNER="pi:pi"                    # uid:gid of data-owner
 
 # query udev argument
 device="$1"
@@ -52,6 +52,7 @@ if mount "/dev/${device}1" "$mountdir"; then
     else
       rsync -a --no-owner --modify-window=1 "$mountdir"/DCIM/*/* "$BACKUP_DIR"
     fi
+    chown -R "$DATA_OWNER" "$BACKUP_DIR"
   fi
   umount "$mountdir"
 else
