@@ -1,0 +1,41 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script installs and configures Samba.
+#
+# Note that this is a very simple and insecure setup, since it allows
+# read/write access to the backuped images for everyone without any password.
+# If you need better security, change /etc/samba/smb.conf accordingly.
+#
+# Please set 'guest account' to the owner of /data/images (normally pi).
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+# --- basic packages   ------------------------------------------------------
+
+apt-get -y install samba
+
+# --- create simple configuration   -----------------------------------------
+
+cat > /etc/samba/smb.conf <<EOF
+[global]
+  workgroup = IMAGETANK
+  security = user
+  map to guest = Bad User
+  guest account = pi
+[images]
+  comment = Image backup
+  path = /data/images
+  browseable = yes
+  writable = yes
+  guest ok = yes
+  guest only = yes
+EOF
+
+# --- restart samba   -------------------------------------------------------
+
+systemctl restart smbd.service

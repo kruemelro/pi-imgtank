@@ -1,0 +1,65 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script installs lighttpd, php and a php-image gallery called
+# photo_archive from http://thevdm.com.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+# --- basic packages   ------------------------------------------------------
+
+apt-get -y install lighttpd php5-cgi php5-apcu php5-gd phpsysinfo
+
+# --- reload configuration   ------------------------------------------------
+
+lighttpd-enable-mod fastcgi-php
+/etc/init.d/lighttpd force-reload
+
+# --- install photo_archive   ------------------------------------------------
+
+#wget http://thevdm.com/wp-content/uploads/2014/09/photo_archive_1.3.zip
+#unzip photo_archive_1.3.zip -d /var/www/html/ photo_archive/
+#rm -f photo_archive_1.3.zip
+
+# we use our own copy, in case the website of photo_archive changes!
+unzip $(dirname "$0")/photo_archive_1.3.zip -d /var/www/html/ photo_archive/
+
+# --- patch photo_archive (reverse sort directories)   -----------------------
+
+( cd /var/www/html/photo_archive/
+  patch <<EOF
+--- index.php   2014-06-22 17:04:44.000000000 +0200
++++ index.php   2016-10-07 16:18:23.064717351 +0200
+@@ -124,7 +124,9 @@
+         echo "</a>";
+     }
+     /* List the folders */
+-    foreach(glob("$folder*", GLOB_ONLYDIR) as $dir) {
++    $dirs = glob("$folder*", GLOB_ONLYDIR);
++    rsort($dirs);
++    foreach($dirs as $dir) {
+         // Get the name of the folder by removing the current folder string
+         $dirShort = str_replace($folder, '', $dir);
+         // Remove 'images/' from the beginning of the string
+EOF
+)
+
+# --- setup directories for the image-backup   -------------------------------
+
+rm -fr /var/www/html/photo_archive/images
+rm -fr /var/www/html/photo_archive/thumbs
+ln -s /data/images /var/www/html/photo_archive/images
+ln -s /data/thumbnails /var/www/html/photo_archive/thumbs
+
+# --- setup status-page for the APC-cache and link phpsysinfo   --------------
+
+ln -s /usr/share/doc/php5-apcu/apc.php /var/www/html
+ln -s /usr/share/phpsysinfo /var/www/html/
+
+# --- fix ownership   --------------------------------------------------------
+chown -R www-data:www-data /var/www
+
