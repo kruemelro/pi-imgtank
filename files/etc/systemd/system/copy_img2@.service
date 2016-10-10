@@ -1,0 +1,7 @@
+[Unit]
+Description=Execute copy_img2 script
+BindsTo=dev-%i.device
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/copy_img2 %I
