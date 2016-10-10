@@ -27,7 +27,7 @@ lighttpd-enable-mod fastcgi-php
 
 # we use our own copy (with minor mods)
 PHOTO_ARCHIVE_ZIP=$(dirname "$0")/photo_archive_1.3_pi-imgtank.zip
-unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/
+unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/*
 
 # --- setup directories for the image-backup   -------------------------------
 
