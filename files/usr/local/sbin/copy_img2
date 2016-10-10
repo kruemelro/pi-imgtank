@@ -96,9 +96,11 @@ prepareSystem() {
   msg "mountdir: $mountdir"
   mkdir -p "$mountdir"
   
-  # try to mount SD-card
-  if ! mount "/dev/${device}1" "$mountdir"; then
-    msg "error: could not mount /dev/${device}1"
+  # try to mount SD-card (try /dev/sdx1 first, then fallback to /dev/sdx)
+  local sd_device="/dev/${device}1"
+  [ ! -b "$sd_device" ] && sd_device="/dev/${device}"
+  if ! mount "$sd_device" "$mountdir"; then
+    msg "error: could not mount $sd_device"
     cleanup
     exit 3
   fi
