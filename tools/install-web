@@ -25,28 +25,9 @@ lighttpd-enable-mod fastcgi-php
 #unzip photo_archive_1.3.zip -d /var/www/html/ photo_archive/
 #rm -f photo_archive_1.3.zip
 
-# we use our own copy, in case the website of photo_archive changes!
-unzip $(dirname "$0")/photo_archive_1.3.zip -d /var/www/html/ photo_archive/
-
-# --- patch photo_archive (reverse sort directories)   -----------------------
-
-( cd /var/www/html/photo_archive/
-  patch <<EOF
---- index.php   2014-06-22 17:04:44.000000000 +0200
-+++ index.php   2016-10-07 16:18:23.064717351 +0200
-@@ -124,7 +124,9 @@
-         echo "</a>";
-     }
-     /* List the folders */
--    foreach(glob("$folder*", GLOB_ONLYDIR) as $dir) {
-+    $dirs = glob("$folder*", GLOB_ONLYDIR);
-+    rsort($dirs);
-+    foreach($dirs as $dir) {
-         // Get the name of the folder by removing the current folder string
-         $dirShort = str_replace($folder, '', $dir);
-         // Remove 'images/' from the beginning of the string
-EOF
-)
+# we use our own copy (with minor mods)
+PHOTO_ARCHIVE_ZIP=$(dirname "$0")/photo_archive_1.3_pi-imgtank.zip
+unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/
 
 # --- setup directories for the image-backup   -------------------------------
 
