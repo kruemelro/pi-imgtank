@@ -48,21 +48,27 @@ To copy the files, clone the project and copy the files:
     rsync -avz files/ /
     exit
 
-This will install an udev-rule which will automatically call the
-script `/usr/local/sbin/copy_img` on plugin of a SD-card. It will
-also install two system-services which control the Pibrella-HAT.
+This will install an udev-rule which will automatically start a
+system-service (`/etc/systemd/system/copy_img2@.services`)
+on plugin of a SD-card. That service in turn will start the
+script `/usr/local/sbin/copy_img2` which does all the copying.
 
-To activate these system-services, run the following commands:
+The commands above also install two system-services which control the
+Pibrella-HAT. To activate these system-services,
+run the following commands:
 
     sudo systemctl enable endofboot.servcie
     sudo systemctl enable hat-pibrella-service
 
-There are two versions of the copy script: `copy_img` and `copy_img2`.
+Note that there are two versions of the copy script: `copy_img` and `copy_img2`.
 The first version does not change filenames while copying images,
 **you therefore risk data-loss if you reset the image-numbers within
 your camera or if you use multiple cameras which use the same
-naming-scheme!** Make sure that `/etc/udev/rules.d/99-usbcopy.rules`
-points to the correct script.
+naming-scheme!**
+
+Make sure that `/etc/systemd/system/copy_img2@.services`
+points to the correct script (the service name is not relevant,
+you have to change the value of `ExecStart` within that file).
 
 
 ### Web access to your images ###
