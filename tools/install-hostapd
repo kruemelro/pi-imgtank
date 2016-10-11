@@ -1,0 +1,100 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script installs hostapd and dnsmasq and configures WLAN0 so the
+# pi will act as an access-point on WLAN0.
+#
+# You should change this file to suit your needs. Specifically, this script
+# configures eth0 to use dhcp and wlan0 with the following attributes:
+#
+#  - wlan-ssid:      pi-imgtank
+#  - wlan-password:  my+pi-imgtank!
+#
+#  - address of pi:  192.168.100.250
+#  - hostname of pi: pi-imgtank
+#  - netmask:        255.255.255.0
+#  - network:        192.168.100.0
+#  - broadcast:      192.168.100.255
+#
+# Note that there is no forwarding between the two network interfaces!
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+# --- basic packages   ------------------------------------------------------
+
+apt-get -y install dnsmasq hostapd
+
+# --- configure hostname and /etc/hosts   -----------------------------------
+
+echo 'pi-imgtank' > /etc/hostname
+hostnamectl set-hostname pi-imgtank
+cat >> /etc/hosts <<EOF
+192.168.100.250 pi-imgtank
+EOF
+
+# --- configure dnsmasq   ---------------------------------------------------
+
+cat > /etc/dnsmasq.conf <<EOF
+interface=wlan0
+expand-hosts
+domain=example.com
+dhcp-range=192.168.100.100,192.168.100.150,12h
+EOF
+
+# --- configure networking   ------------------------------------------------
+
+cp -a /etc/network/interfaces /etc/network/interfaces.bak
+rm -f /etc/network/interfaces
+cat > /etc/network/interfaces <<EOF
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+auto wlan0
+iface wlan0 inet static
+address   192.168.100.250
+netmask   255.255.255.0
+network   192.168.100.0
+broadcast 192.168.100.255
+EOF
+
+# --- configure hostapd   ---------------------------------------------------
+
+cat > /etc/default/hostapd <<EOF
+DAEMON_CONF=/etc/hostapd.conf
+EOF
+
+cat > /etc/hostapd.conf <<EOF
+ssid=pi-imgtank
+
+ctrl_interface=/var/run/hostapd
+interface=wlan0
+driver=nl80211
+channel=11
+
+beacon_int=100
+hw_mode=g
+ieee80211n=0
+wmm_enabled=1
+ht_capab=[SHORT-GI-20][SHORT-GI-40][HT40-]
+
+wpa=2
+wpa_passphrase=my+pi-imgtank!
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP TKIP
+max_num_sta=8
+wpa_group_rekey=86400
+EOF
+
+# --- restart services   ----------------------------------------------------
+
+systemctl restart networking.service
+systemctl restart dnsmasq.service
+systemctl restart hostapd.service
