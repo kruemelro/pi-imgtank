@@ -71,6 +71,14 @@ points to the correct script (the service name is not relevant,
 you have to change the value of `ExecStart` within that file).
 
 
+### Using the Imagetank as an Access-Point ###
+
+Since the Pi3 has a builtin WIFI chip, we can set it up as an access-point.
+This allows access to the images even when not connected to a
+dedicated network. For instructions, see
+[Setting up an Access-Point](./doc/hostapd_install.md 
+"Setting up an Access-Point").
+
 ### Web access to your images ###
 
 If you want to browse the images on the imagetank, you have to install
