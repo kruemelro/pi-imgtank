@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Raspberry Pi Imagetank main page">
+
+    <title>Raspberry Pi Image-Tank</title>
+
+    <!-- layout and styling thanks to purecss.io -->
+    <link rel="stylesheet" href="css/pure-min.css">
+    <link rel="stylesheet" href="css/layouts/side-menu.css">
+
+     <!-- jquery and special functions -->
+     <script src="js/jquery-min.js"></script>
+  </head>
+
+  <body style="margin:0">
+
+    <div id="layout">
+      <!-- Menu toggle -->
+      <a href="#menu" id="menuLink" class="menu-link">
+        <span></span>
+      </a>
+
+      <div id="menu">
+        <div class="pure-menu">
+            <a class="pure-menu-heading" href="#">Info</a>
+            <ul class="pure-menu-list">
+               <li class="pure-menu-item">
+                 <a href="photo_archive"
+                     target="content"
+                     class="pure-menu-link">Images</a></li>
+               <li class="pure-menu-item">
+                 <a href="upload/upload.html" target="content"
+                     class="pure-menu-link">Uplaod</a></li>
+               <li class="pure-menu-item">
+                 <a href="phpsysinfo" target="content"
+                     class="pure-menu-link">System</a></li>
+            </ul>
+
+            <a class="pure-menu-heading" href="#">About</a>
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item">
+                  <a onclick="handleAuthor()" 
+                     class="pure-menu-link">Author</a></li>
+                <li class="pure-menu-item">
+                  <a onclick="handleLicense()"
+                     class="pure-menu-link">License</a></li>
+                <li class="pure-menu-item">
+                  <a href="https://github.com/bablokb/pi-imgtank" target="_blank"
+                     class="pure-menu-link">Project</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="header">
+            <h1>Raspberry Pi Imagetank</h1>
+        </div>
+
+          <iframe id="content" src="photo_archive" name="content" 
+                  style="display:block;border:none;height:85vh;width:100%"/>
+	    
+    <script src="js/ui.js"></script>
+
+</body>
+</html>
