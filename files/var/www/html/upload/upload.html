@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+__________________________________________________________________________
+*
+* File upload page.
+*
+* Author: Bernhard Bablok
+* License: GPL3
+*
+* Website: https://github.com/bablokb/pi-imgtank
+_______________________________________________________________________________
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+      <link rel="stylesheet" href="../css/pure-min.css">
+        <title>Upload file</title>
+        <script src="../js/jquery-min.js"></script>
+        <script type="text/javascript" src="upload.js"></script>
+        <script type="text/javascript">
+          $(document).ready(function () {
+            $(':button').click(function () {
+              var formData = new FormData($('form')[0]);
+              $.ajax({
+                url: 'upload.php',
+                type: 'POST',
+                xhr: function () {
+                  var myXhr = $.ajaxSettings.xhr();
+                  if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', setProgress, false);
+                  }
+                  return myXhr;
+                },
+              
+                //Ajax events
+                beforeSend: resetProgress,
+                success: sendOk,
+                error: sendError,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+              });
+            });
+          });
+        </script>
+        <style type="text/css">
+            .msgerr {color: red;}
+            .msgok {color: green;}
+        </style>
+    </head>
+    <body>
+        <h1>Upload file to server</h1>
+
+        <!--Message area (content via sendOk/sendError) -->
+        <p><span id="msgarea"></span></p>
+
+        <!--Upload-Form -->
+        <form id="form_upload" class="pure-form" method="post"
+              enctype="multipart/form-data">
+            <input class="pure-button" type="file" name="fileToUpload[]" 
+                   multiple="multiple" id="fileToUpload">
+            <button id="bt_sub" type="button" 
+                   class="pure-button  pure-button-primary">Upload</button>
+        </form>
+        <progress max="100" value="0"></progress>
+    </body>
+</html>
