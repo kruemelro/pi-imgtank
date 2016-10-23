@@ -1,0 +1,8 @@
+[Unit]
+Description=Process images in /data/uploads
+Documentation=http://unix.stackexchange.com/questions/203637/
+StartLimitIntervalSec=10
+StartLimitBurst=1
+
+[Service]
+ExecStart=/usr/local/sbin/mv_img2

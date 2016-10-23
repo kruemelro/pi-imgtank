@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch /data/uploads and activate mv_img2.service
+Documentation=http://unix.stackexchange.com/questions/203637/
+
+[Path]
+DirectoryNotEmpty=/data/uploads/
+
+[Install]
+WantedBy=multi-user.target
