@@ -14,10 +14,12 @@
 
 apt-get -y install lighttpd php5-cgi php5-apcu php5-gd phpsysinfo
 
-# --- reload configuration   ------------------------------------------------
+# --- configure php   --------------------------------------------------------
 
-lighttpd-enable-mod fastcgi-php
-/etc/init.d/lighttpd force-reload
+sed -i -e '/post_max_size/s/^.*post_max_size =.*/post_max_size = 64M/' \
+  -e '/upload_max_filesize/s/^.*upload_max_filesize =.*/upload_max_filesize = 64M/' \
+  -e '/upload_tmp_dir/s/^.*upload_tmp_dir =.*/upload_tmp_dir = \/data\/tmp/' \
+        /etc/php5/cgi/php.ini
 
 # --- install photo_archive   ------------------------------------------------
 
@@ -38,8 +40,8 @@ ln -s /data/thumbnails /var/www/html/photo_archive/thumbs
 
 # --- setup directories for the image-upload   -------------------------------
 
-mkdir -p /data/uploads
-chown -R www-data:www-data 
+mkdir -p /data/uploads /data/tmp
+chown -R www-data:www-data /data/uploads /data/tmp
 
 # --- setup status-page for the APC-cache and link phpsysinfo   --------------
 
@@ -49,3 +51,7 @@ ln -s /usr/share/phpsysinfo /var/www/html/
 # --- fix ownership   --------------------------------------------------------
 chown -R www-data:www-data /var/www
 
+# --- reload configuration   ------------------------------------------------
+
+lighttpd-enable-mod fastcgi-php
+/etc/init.d/lighttpd force-reload
