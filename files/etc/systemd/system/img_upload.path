@@ -1,5 +1,5 @@
 [Unit]
-Description=Watch /data/uploads and activate mv_img2.service
+Description=Watch /data/uploads and activate img_upload.service
 Documentation=http://unix.stackexchange.com/questions/203637/
 
 [Path]
