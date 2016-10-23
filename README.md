@@ -58,7 +58,7 @@ Pibrella-HAT. To activate these system-services,
 run the following commands:
 
     sudo systemctl enable endofboot.servcie
-    sudo systemctl enable hat-pibrella-service
+    sudo systemctl enable hat-pibrella-server.service
 
 Note that there are two versions of the copy script: `copy_img` and `copy_img2`.
 The first version does not change filenames while copying images,
