@@ -1,0 +1,111 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script is triggered by a systemd.path/systemd.service unit
+# It moves all images from the upload directory to individual directories.
+#
+# Special features:
+#   - rename files to a unique ID: pii123456.*
+#   - copies to subdirs per day
+#   - create thumbnails
+#
+# If DEBUG=1, messages go the the syslog. To view the messages, run
+#   sudo journalctl SYSLOG_IDENTIFIER=mv_img2
+#
+# Dependencies: GraphicsMagick
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+. source $(dirname "$0")/copy_mv_img2.inc
+
+# --- global settings   -----------------------------------------------------
+
+setDefaults() {
+  setGlobalDefaults()
+  UPLOAD_ROOT="$DATA_ROOT/uploads"
+}
+
+# --- prepare system   -----------------------------------------------------
+
+prepareSystem() {
+  # change state of HAT: Action Start
+  /usr/local/sbin/hatctl.py AS
+
+  # create IMAGE_ROOT (if it does not exist)
+  if [ ! -d "$IMAGE_ROOT" ]; then
+    mkdir -p "$IMAGE_ROOT"
+    chown "$DATA_OWNER" "$IMAGE_ROOT"
+  fi
+
+  # create THUMB_ROOT (if it does not exist)
+  if [ ! -d "$THUMB_ROOT" ]; then
+    mkdir -p "$THUMB_ROOT"
+    chown "$DATA_OWNER" "$THUMB_ROOT"
+  fi
+}
+
+# --- cleanup   -------------------------------------------------------------
+
+cleanup() {
+  # change state of HAT: Action End
+  /usr/local/sbin/hatctl.py AE
+}
+
+# --- move all images   ----------------------------------------------------
+
+moveFiles() {
+  # find all files in UPLOAD_ROOT
+
+  local img srcStem srcStemNew targetStem ext
+  for img in $(find "$UPLOAD_ROOT" -type f | sort); do
+    msg "processing $img"
+
+    # check if we already copied a file with the same stem
+    local srcStemNew="${img%.*}"
+    if [ "$srcStem" != "$srcStemNew" ]; then
+      # make the new stem the current stem
+      srcStem="$srcStemNew"
+
+      # query date of current image and create target directory
+      # TODO: use exif-date instead! File-date of uploaded files is invalid
+      local imgDate=$(date -r "$img" '+%Y%m%d')
+
+      if [ ! -d "$IMAGE_ROOT/$imgDate" ]; then
+        mkdir -p "$IMAGE_ROOT/$imgDate"
+        chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate"
+        mkdir -p "$THUMB_ROOT/$imgDate"
+        chown "$DATA_OWNER" "$THUMB_ROOT/$imgDate"
+      fi
+
+      # get stem of target filename
+      targetStem=$(nextNumber)
+    fi
+
+    # now move image
+    ext="${img##*.}"
+    ext="${ext,,}"        # convert to lowercase
+    msg "moving $img to $IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    mv "$img" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    chmod -wx "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+    chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
+
+    # create thumbnail
+    [ "$ext" = "jpg" ] && createThumb "$imgDate/$targetStem.$ext"
+  done
+
+  if [ ! -f "$img" ]; then
+    msg "no images to move"
+  fi
+}
+
+# --- main program   ---------------------------------------------------------
+
+setDefaults
+checkDevice "$1"
+prepareSystem
+moveFiles
+cleanup
