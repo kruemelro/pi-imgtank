@@ -111,7 +111,7 @@ copyFiles() {
       srcStem="$srcStemNew"
 
       # query date of current image and create target directory
-      local imgDate=$(date -r "$img" '+%Y%m%d')
+      local imgDate=$(getImageDate "$img")
       if [ ! -d "$IMAGE_ROOT/$imgDate" ]; then
         mkdir -p "$IMAGE_ROOT/$imgDate"
         chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate"
