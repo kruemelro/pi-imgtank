@@ -45,7 +45,21 @@ nextNumber() {
   echo "$IMG_PREFIX$(printf '%04g' $cNum)"
 }
 
-# --- create thumbnail of a given image   ----------------------------------
+# --- get date of image   ----------------------------------------------------
+
+getImageDate() {
+  local d=$(gm identify -format '%[EXIF:DateTimeOriginal]' "$1" | \
+                                                     cut -d" " -f1 | tr -d ':')
+  if [ -n "$d" ]; then
+    # exif date is available, so use it
+    echo "$d"
+  else
+    # fallback to date of image-file
+    date -r "$1" '+%Y%m%d'
+  fi
+}
+
+# --- create thumbnail of a given image   ------------------------------------
 
 createThumb() {
   local src="$IMAGE_ROOT/$1"
