@@ -62,7 +62,7 @@ if ($_FILES['fileToUpload']) {
             continue;
         }
 // Check file size
-        if ($file["size"] > 5000000) {
+        if ($file["size"] > 20000000) {
             $status = "error";
             $msg = "$msg<p class='msgerr'>File $base_esc is too large.</p>";
             http_response_code(412);
