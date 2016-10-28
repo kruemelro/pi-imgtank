@@ -27,7 +27,7 @@ sets up your system and your HDD/SDD.
 Additionally install the following packages:
 
     sudo apt-get update
-    sudo apt-get install rsync GraphicsMagick python-pip
+    sudo apt-get install git rsync GraphicsMagick python-pip
 
 
 ### Install Pibrella support library ###
