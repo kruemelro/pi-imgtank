@@ -37,3 +37,7 @@ mounted and the space is available.
 If you are a Linux-user you can automate all the above steps. For
 details, see [auto_install.md](./auto_install.md 
  "Automatic installation of Raspbian to a hard-disk").
+
+In case you just want to test the image-tank, you can also go
+standalone without an HDD/SDD. In this case, you should at least
+create the directory `/data` as described above.
