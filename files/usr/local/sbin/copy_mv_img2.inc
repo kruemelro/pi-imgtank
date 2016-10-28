@@ -49,7 +49,7 @@ nextNumber() {
 
 getImageDate() {
   local d=$(gm identify -format '%[EXIF:DateTimeOriginal]' "$1" | \
-                                                     cut -d" " -f1 | tr -d ':')
+                                                    cut -d" " -f1 | tr -d ':' )
   if [ -n "$d" ]; then
     # exif date is available, so use it
     echo "$d"

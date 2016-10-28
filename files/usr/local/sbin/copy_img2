@@ -26,7 +26,7 @@ source $(dirname "$0")/copy_mv_img2.inc
 # --- global settings   -----------------------------------------------------
 
 setDefaults() {
-  setGlobalDefaults()
+  setGlobalDefaults
 }
 
 # --- check device   --------------------------------------------------------

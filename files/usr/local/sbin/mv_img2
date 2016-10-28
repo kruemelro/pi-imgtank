@@ -20,12 +20,12 @@
 #
 # ---------------------------------------------------------------------------
 
-. source $(dirname "$0")/copy_mv_img2.inc
+source $(dirname "$0")/copy_mv_img2.inc
 
 # --- global settings   -----------------------------------------------------
 
 setDefaults() {
-  setGlobalDefaults()
+  setGlobalDefaults
   UPLOAD_ROOT="$DATA_ROOT/uploads"
 }
 
@@ -96,7 +96,7 @@ moveFiles() {
     [ "$ext" = "jpg" ] && createThumb "$imgDate/$targetStem.$ext"
   done
 
-  if [ ! -f "$img" ]; then
+  if [ -z "$img" ]; then
     msg "no images to move"
   fi
 }
@@ -104,7 +104,6 @@ moveFiles() {
 # --- main program   ---------------------------------------------------------
 
 setDefaults
-checkDevice "$1"
 prepareSystem
 moveFiles
 cleanup
