@@ -3,7 +3,9 @@ Install Samba as a Fileserver
 
 To install and configure samba, run
 
-    sudo tools/install-samba
+    sudo su -
+    cd pi-imgtank
+    tools/install-samba
 
 Note that this is a very simple and insecure setup, since it allows
 read/write access to the backuped images for everyone without any password.

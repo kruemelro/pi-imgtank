@@ -3,7 +3,9 @@ Setting up an Access-Point
 
 To set up an access-point, edit `tools/install-hostapd` to your needs and run
 
-    sudo tools/install-hostapd
+    sudo su -
+    cd pi-imgtank
+    tools/install-hostapd
 
 This will install `hostapd` and `dnsmasq` and configure both packages.
 
