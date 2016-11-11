@@ -16,6 +16,10 @@ use to signal state and a button, which we use for shutdown.
 
 ![Pi with Pibrella](images/pibrella.jpg "Pi with Pibrella")
 
+You could also use the system without the extension board or use
+a different solution like one of the simple TFT touch screens. In this
+case you have to put tweak some of the scripts of this project.
+
 
 Installation
 ------------
@@ -24,41 +28,24 @@ First, install your system as described in
 [Basic installation](./doc/basic_install.md "Basic installation"). This
 sets up your system and your HDD/SDD.
 
-Additionally install the following packages:
-
-    sudo apt-get update
-    sudo apt-get install git rsync GraphicsMagick python-pip
-
-
-### Install Pibrella support library ###
-
-To install the python library for Pibrella run the following command:
-
-    sudo pip install pibrella
-
-
-### Install specific imagetank files ###
-
-All necessary files are below the `files`-directory of this project.
-To copy the files, clone the project and copy the files:
+After basic installation, you need to install the files specific
+to the image tank:
 
     sudo su -
     git clone https://github.com/bablokb/pi-imgtank.git
     cd pi-imgtank
-    rsync -avz files/ /
+    sudo tools/install-piimgtank
     exit
 
-This will install an udev-rule which will automatically start a
+This will install some scripts and configuration files needed
+by the imagetank. It also configures a number of systemd-services
+which will control the leds of the Pibrella-board and which take
+care of copying the images.
+
+The core of the tank is an udev-rule which will automatically start a
 system-service (`/etc/systemd/system/copy_img2@.services`)
 on plugin of a SD-card. That service in turn will start the
 script `/usr/local/sbin/copy_img2` which does all the copying.
-
-The commands above also install two system-services which control the
-Pibrella-HAT. To activate these system-services,
-run the following commands:
-
-    sudo systemctl enable endofboot.servcie
-    sudo systemctl enable hat-pibrella-server.service
 
 Note that there are two versions of the copy script: `copy_img` and `copy_img2`.
 The first version does not change filenames while copying images,
@@ -86,6 +73,9 @@ a webserver on the system. You can find the necessary instructions
 in the document [Installing a Webserver](./doc/web_install.md 
 "Installing a Webserver").
 
+Once installed, you can also upload files using the web-interface. All
+uploaded files will also be moved in the same way as files from a
+SD-card.
 
 ### Using the Imagetank as a Fileserver ###
 
@@ -93,6 +83,7 @@ The imagetank is meant as a backup solution. In case you need to recover
 your files, a Samba-server comes in handy to access your images from
 any computer within your network. You can find a setup instruction
 [here](./doc/samba_install.md "Installing Samba").
+
 
 Operation
 ---------
