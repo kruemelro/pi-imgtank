@@ -15,13 +15,7 @@ This will install `hostapd` and `dnsmasq` and configure both packages.
 If you also install the [webserver](./doc/web_install.md 
 "Installing a Webserver"), you can access the images using the address 
 
-    http://pi-imgtank/photo_archive/
-
-while
-
-    http://pi-imgtank/phpsysinfo/
-
-will give you a status-overview over your system.
+    http://pi-imgtank/
 
 This works since `dnsmasq` will resolve all hostnames from `/etc/hosts`
 and the installation script adds `pi-imgtank` to `/etc/hosts`.

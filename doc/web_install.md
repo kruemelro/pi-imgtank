@@ -10,10 +10,5 @@ photo-gallery, run
 
 You can now access your images with the address:
 
-    http://address-of-your-pi/photo_archive/
+    http://address-of-your-pi/
 
-while
-
-    http://address-of-your-pi/phpsysinfo/
-
-will give you a status-overview over your system.
