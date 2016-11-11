@@ -8,6 +8,32 @@
 //
 // ---------------------------------------------------------------------------
 
+
+/**
+ * Callback for file-selection change event
+ */
+
+function onChangeFileSelect(evt) {
+  console.error("onChangeFileSelect",evt);
+  var files = evt.target.files; // FileList object
+  var msgok = "", msgerr = "";
+  for (var i = 0, f; f = files[i]; i++) {
+    // support only image files
+    if (!f.type.match('image.*')) {
+      msgerr += "<p class='msgerr'>" + f.name + ": Unsupported file type</p>";
+      continue;
+    } else {
+      msgok += "<p class='msgok'>" + f.name + " (" + f.size +") ready for upload</p>";
+    }
+  }
+  if (msgerr.length > 0) {
+    $("#msgarea").html(msgerr);
+  } else {
+    $("#msgarea").html(msgok);
+    $("#bt_sub").prop( "disabled",false);
+  }
+}
+
 /**
  * Callback for ajax upload (set message-area in case of success aka HTTP 200)
  */
@@ -33,10 +59,11 @@ function sendError(data) {
 }
 
 /**
- * Reset progress indicator
+ * Before upload (Reset progress indicator, disable button)
  */
 
-function resetProgress() {
+function beforeSend() {
+    $("#bt_sub").prop( "disabled",true);
     $('progress').attr({value: 0, max: 100});
 }
 
