@@ -1,0 +1,33 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script installs files and services specific to the pi-imgtank.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+# --- basic packages   ------------------------------------------------------
+
+apt-get update
+apt-get install git rsync GraphicsMagick python-pip
+
+# --- install pibrella support-library   ------------------------------------
+
+pip install pibrella
+
+# --- install specific files   ----------------------------------------------
+
+rsync -avz $(dirname "$0")/../files/ /
+
+# --- enable/restart services   ---------------------------------------------
+
+systemctl enable endofboot.servcie
+systemctl enable hat-pibrella-server.service
+systemctl enable img_upload.path
+
+systemctl start endofboot.servcie
+systemctl start hat-pibrella-server.service
+systemctl start img_upload.path
