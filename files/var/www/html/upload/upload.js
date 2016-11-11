@@ -21,7 +21,8 @@ function onChangeFileSelect(evt) {
     // support only image files
     if (!f.type.match('image.*')) {
       msgerr += "<p class='msgerr'>" + f.name + ": Unsupported file type</p>";
-      continue;
+    } else if (f.size > 20000000) {
+      msgerr += "<p class='msgerr'>" + f.name + ": too large (limit is 20000000 bytes)</p>";
     } else {
       msgok += "<p class='msgok'>" + f.name + " (" + f.size +") ready for upload</p>";
     }
