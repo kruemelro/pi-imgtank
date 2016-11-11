@@ -52,9 +52,14 @@ _______________________________________________________________________________
         <style type="text/css">
             .msgerr {color: red;}
             .msgok {color: green;}
+	    .preview {
+	      height: 75px;
+	      border: 1px solid #000;
+	      margin: 10px 5px 0 0;
+	    }
         </style>
     </head>
-    <body>
+    <body style="margin: 1em">
         <h1>Upload file to server</h1>
 
         <!--Message area (content via sendOk/sendError) -->
@@ -68,6 +73,7 @@ _______________________________________________________________________________
             <button id="bt_sub" type="button" disabled="disabled"
                    class="pure-button  pure-button-primary">Upload</button>
         </form>
-        <progress max="100" value="0" style="margin-top: 1em"></progress>
+        <progress max="100" value="0" style="margin: 1em 1em 0 0"></progress>
+        <div id="previews" style="display: block"></div>
     </body>
 </html>
