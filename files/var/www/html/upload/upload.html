@@ -20,6 +20,10 @@ _______________________________________________________________________________
         <script type="text/javascript" src="upload.js"></script>
         <script type="text/javascript">
           $(document).ready(function () {
+            // add change-event listener to form
+            $('form')[0].addEventListener('change',onChangeFileSelect,false);
+
+            // add click-event listener to button
             $(':button').click(function () {
               var formData = new FormData($('form')[0]);
               $.ajax({
@@ -34,7 +38,7 @@ _______________________________________________________________________________
                 },
               
                 //Ajax events
-                beforeSend: resetProgress,
+                beforeSend: beforeSend,
                 success: sendOk,
                 error: sendError,
                 data: formData,
@@ -61,9 +65,9 @@ _______________________________________________________________________________
               enctype="multipart/form-data">
             <input class="pure-button" type="file" name="fileToUpload[]" 
                    multiple="multiple" id="fileToUpload">
-            <button id="bt_sub" type="button" 
+            <button id="bt_sub" type="button" disabled="disabled"
                    class="pure-button  pure-button-primary">Upload</button>
         </form>
-        <progress max="100" value="0"></progress>
+        <progress max="100" value="0" style="margin-top: 1em"></progress>
     </body>
 </html>
