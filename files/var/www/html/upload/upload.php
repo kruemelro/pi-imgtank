@@ -50,37 +50,37 @@ if ($_FILES['fileToUpload']) {
         $check = getimagesize($file["tmp_name"]);
         if ($check === TRUE) {
             $status = "error";
-            $msg = "$msg<p class='msgerr'>File $base_esc is not an image.</p>";
+            $msg = "$msg<p class='upload_msgerr'>File $base_esc is not an image.</p>";
             http_response_code(412);
             continue;
         }
 // Check if file already exists
         if (file_exists($target_file)) {
             $status = "error";
-            $msg = "$msg<p class='msgerr'>File $base_esc already exists.</p>";
+            $msg = "$msg<p class='upload_msgerr'>File $base_esc already exists.</p>";
             http_response_code(412);
             continue;
         }
 // Check file size
         if ($file["size"] > 20000000) {
             $status = "error";
-            $msg = "$msg<p class='msgerr'>File $base_esc is too large.</p>";
+            $msg = "$msg<p class='upload_msgerr'>File $base_esc is too large.</p>";
             http_response_code(412);
             continue;
         }
 // Allow certain file formats
         if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
             $status = "error";
-            $msg = "$msg<p class='msgerr'>File $base_esc is neither JPG, JPEG, PNG or GIF.</p>";
+            $msg = "$msg<p class='upload_msgerr'>File $base_esc is neither JPG, JPEG, PNG or GIF.</p>";
             http_response_code(412);
             continue;
         }
 
         if (move_uploaded_file($file["tmp_name"], $target_file)) {
-            $msg = "$msg<p class='msgok'>File $base_esc has been uploaded.</p>";
+            $msg = "$msg<p class='upload_msgok'>File $base_esc has been uploaded.</p>";
         } else {
             $status = "error";
-            $msg = "$msg<p class='msgerr'>Error while uploading file $base_esc.</p>";
+            $msg = "$msg<p class='upload_msgerr'>Error while uploading file $base_esc.</p>";
             http_response_code(500);
         }
     }
