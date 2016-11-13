@@ -1,0 +1,31 @@
+/*
+ * Additional styles for pi-imgtank
+ *
+ * Author: Bernhard Bablok
+ * License: GPL3
+ *
+ * Website: https://github.com/bablokb/pi-imgtank
+*/
+
+.upload_msgerr, .upload_msgok { 
+  margin: 10px 0px;
+  padding:12px;
+  border: 1px solid;
+  border-radius:.5em;
+}
+
+.upload_msgerr {
+  color: red;
+  background-color: LightCoral;
+}
+
+.upload_msgok {
+  color: green;
+  background-color: LightGreen;
+}
+
+.upload_preview {
+  height: 75px;
+  border: 1px solid #000;
+  margin: 10px 5px 0 0;
+}
