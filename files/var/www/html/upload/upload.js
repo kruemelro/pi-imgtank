@@ -45,11 +45,11 @@ function onChangeFileSelect(evt) {
   for (var i = 0, f; f = files[i]; i++) {
     // support only image files
     if (!f.type.match('image.*')) {
-      msgerr += "<p class='upload_msgerr'>" + f.name + ": Unsupported file type</p>";
+      msgerr += "<div class='upload_msgerr'>" + f.name + ":Unsupported file type</div><br>";
     } else if (f.size > 20000000) {
-      msgerr += "<p class='upload_msgerr'>" + f.name + ": too large (limit is 20000000 bytes)</p>";
+      msgerr += "<div class='upload_msgerr'>" + f.name + ": too large(limit is 20000000 bytes)</div><br>";
     } else {
-      msgok += "<p class='upload_msgok'>" + f.name + " (" + f.size +") ready for upload</p>";
+      msgok += "<div class='upload_msgok'>" + f.name + " (" + f.size+") ready for upload</div><br>";
     }
   }
 
@@ -83,7 +83,7 @@ function sendOk(data) {
     var result = JSON.parse(data);
     $("#msgarea").html(result.msg);
   } else {
-    $("#msgarea").html("<p class='upload_msgerr'>Unknown failure.</p>");
+    $("#msgarea").html("<div class='upload_msgerr'>Unknown failure.</div><br>");
   }
 }
 
