@@ -7,7 +7,8 @@
  * Website: https://github.com/bablokb/pi-imgtank
 */
 
-.upload_msgerr, .upload_msgok { 
+.upload_msgerr, .upload_msgok {
+  display: inline-block;
   margin: 10px 0px;
   padding:12px;
   border: 1px solid;
@@ -16,12 +17,12 @@
 
 .upload_msgerr {
   color: red;
-  background-color: LightCoral;
+  background-color: #ffe6e6;
 }
 
 .upload_msgok {
   color: green;
-  background-color: LightGreen;
+  background-color: #e6ffe6;
 }
 
 .upload_preview {
