@@ -24,10 +24,10 @@ rsync -avz $(dirname "$0")/../files/ /
 
 # --- enable/restart services   ---------------------------------------------
 
-systemctl enable endofboot.servcie
+systemctl enable endofboot.service
 systemctl enable hat-pibrella-server.service
 systemctl enable img_upload.path
 
-systemctl start endofboot.servcie
+systemctl start endofboot.service
 systemctl start hat-pibrella-server.service
 systemctl start img_upload.path
