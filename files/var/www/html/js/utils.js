@@ -8,12 +8,42 @@
 //
 // ---------------------------------------------------------------------------
 
+
+/**
+  Show message in message-area
+*/
+
+showMsg=function(text,time) {
+  $("#msgarea").html("<div class='msg_info'>"+text+"</div><br>");
+  setTimeout(function() {
+               $("#msgarea").empty();
+             }, time);
+};
+
+/**
+  Handle action shutdown
+*/
+
+handleShutdown=function() {
+  $.post("php/shutdown.php");
+  showMsg("Shutting the system down...",2000);
+};
+
+/**
+  Handle action reboot
+*/
+
+handleReboot=function() {
+  $.post("php/reboot.php");
+  showMsg("Rebooting the system down...",2000);
+};
+
 /**
  * Handle author info.
  */
 
 function onAuthorClicked() {
-  alert("Copyright Bernhard Bablok, bablokb@gmx.de");
+  showMsg("Copyright Bernhard Bablok, bablokb@gmx.de",3000);
 }
 
 /**
@@ -21,6 +51,6 @@ function onAuthorClicked() {
  */
 
 function onLicenseClicked() {
-  alert("Unless otherwise noted, the code of this project is realeased under the GPL3");
+  showMsg("Unless otherwise noted, the code of this project is realeased under the GPL3",3000);
 }
 
