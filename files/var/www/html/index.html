@@ -27,32 +27,42 @@
 
       <div id="menu">
         <div class="pure-menu">
-            <a class="pure-menu-heading" href="#">Info</a>
-            <ul class="pure-menu-list">
-               <li class="pure-menu-item">
-                 <a href="photo_archive"
-                     target="content"
-                     class="pure-menu-link">Images</a></li>
-               <li class="pure-menu-item">
-                 <a href="upload/upload.html" target="content"
-                     class="pure-menu-link">Upload</a></li>
-               <li class="pure-menu-item">
-                 <a href="phpsysinfo" target="content"
-                     class="pure-menu-link">System</a></li>
-            </ul>
+          <a class="pure-menu-heading" href="#">Archive</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a href="photo_archive"
+                target="content"
+                class="pure-menu-link">Images</a></li>
+            <li class="pure-menu-item">
+              <a href="upload/upload.html" target="content"
+                class="pure-menu-link">Upload</a></li>
+          </ul>
 
-            <a class="pure-menu-heading" href="#">About</a>
-            <ul class="pure-menu-list">
-                <li class="pure-menu-item">
-                  <a onclick="onAuthorClicked()"
-                     class="pure-menu-link">Author</a></li>
-                <li class="pure-menu-item">
-                  <a onclick="onLicenseClicked()"
-                     class="pure-menu-link">License</a></li>
-                <li class="pure-menu-item">
-                  <a href="https://github.com/bablokb/pi-imgtank" target="_blank"
-                     class="pure-menu-link">Project</a></li>
-            </ul>
+          <a class="pure-menu-heading" href="#">System</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a href="phpsysinfo" target="content"
+                class="pure-menu-link">Status</a></li>
+            <li class="pure-menu-item">
+              <a onclick="handleReboot()"
+                class="pure-menu-link">Reboot</a></li>
+            <li class="pure-menu-item">
+              <a onclick="handleShutdown()" 
+                class="pure-menu-link">Shutdown</a></li>
+          </ul>
+
+          <a class="pure-menu-heading" href="#">About</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a onclick="onAuthorClicked()"
+                class="pure-menu-link">Author</a></li>
+            <li class="pure-menu-item">
+              <a onclick="onLicenseClicked()"
+                class="pure-menu-link">License</a></li>
+            <li class="pure-menu-item">
+              <a href="https://github.com/bablokb/pi-imgtank" target="_blank"
+                class="pure-menu-link">Project</a></li>
+          </ul>
         </div>
     </div>
 
@@ -60,6 +70,9 @@
         <div class="header">
             <h1>Raspberry Pi Imagetank</h1>
         </div>
+
+        <!--Message area (content via handler) -->
+        <p><span id="msgarea"></span></p>
 
           <iframe id="content" src="photo_archive" name="content" 
                   style="display:block;border:none;height:85vh;width:100%"/>
