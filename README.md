@@ -16,9 +16,13 @@ use to signal state and a button, which we use for shutdown.
 
 ![Pi with Pibrella](images/pibrella.jpg "Pi with Pibrella")
 
-You could also use the system without the extension board or use
-a different solution like one of the simple TFT touch screens. In this
-case you have to put tweak some of the scripts of this project.
+You can also use the system without the extension board or use
+a different solution like one of the simple TFT touch screens. Read
+[Imagetank without additional Hardware](./doc/no_hat.md 
+"Using the Imagetank without Additional Hardware") if you just
+want to go with the hardware of your Pi. If you instead want to
+different hardware, you will have to tweak some of the scripts of this
+project.
 
 
 Installation
