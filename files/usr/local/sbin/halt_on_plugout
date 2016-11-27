@@ -1,0 +1,43 @@
+#!/bin/bash
+# ---------------------------------------------------------------------------
+# This script is triggered by an udev-rule in /etc/udev/rules.d/99-usbhalt.rules.
+# It shuts down the system after plugout of the sd-device.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+source $(dirname "$0")/copy_mv_img2.inc
+
+# --- global settings   -----------------------------------------------------
+
+setDefaults() {
+  setGlobalDefaults
+}
+
+# --- check device   --------------------------------------------------------
+
+checkDevice() {
+  # query udev argument
+  device="$1"
+  msg "info: checking: $1"
+  model=$(</sys/block/$device/device/model)
+  msg "info: model is: $model"
+
+  # we just ignore sda because this should be our os and/or target harddisk
+  # change this heuristic to your needs!
+  if [ "$device" = "sda" ]; then
+    msg "info: ignoring device sda (probably no SD-card)"
+    exit 0
+  fi
+}
+
+# --- main program   ---------------------------------------------------------
+
+setDefaults
+checkDevice "$1"
+msg "info: initiating system halt"
+systemctl --no-block poweroff
