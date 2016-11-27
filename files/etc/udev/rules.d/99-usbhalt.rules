@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# Shutdown the system after plugout of an usb-storage device.
+#
+# !!! To activate the rule, remove the comment (#) in front of it !!!
+#
+# Note that the script is called directly. It will only do some
+# sanity checks and then initiate system halt, so there should be no
+# issue because of the runtime of the script.
+#
+# Author: Bernhard Bablok
+# License: GPL3
+#
+# Website: https://github.com/bablokb/pi-imgtank
+#
+# ---------------------------------------------------------------------------
+
+#KERNEL=="sd?", SUBSYSTEMS=="usb", ACTION=="remove", RUN+="/usr/local/sbin/halt_on_plugout"
