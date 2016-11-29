@@ -44,7 +44,7 @@ if ($_FILES['fileToUpload']) {
         $base = basename($file["name"]);
         $base_esc = htmlspecialchars(($base));
         $target_file = $target_dir . $base;
-        $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
 // Check if image file is a actual image or fake image
         $check = getimagesize($file["tmp_name"]);
