@@ -19,7 +19,7 @@ apt-get -y install lighttpd php-cgi php-apcu php-gd phpsysinfo
 sed -i -e '/post_max_size/s/^.*post_max_size =.*/post_max_size = 64M/' \
   -e '/upload_max_filesize/s/^.*upload_max_filesize =.*/upload_max_filesize = 64M/' \
   -e '/upload_tmp_dir/s/^.*upload_tmp_dir =.*/upload_tmp_dir = \/data\/tmp/' \
-        /etc/php5/cgi/php.ini
+        /etc/php/7.3/cgi/php.ini
 
 # --- install photo_archive   ------------------------------------------------
 
@@ -28,15 +28,20 @@ sed -i -e '/post_max_size/s/^.*post_max_size =.*/post_max_size = 64M/' \
 #rm -f photo_archive_1.3.zip
 
 # we use our own copy (with minor mods)
-PHOTO_ARCHIVE_ZIP=$(dirname "$0")/photo_archive_1.3_pi-imgtank.zip
-unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/*
+#PHOTO_ARCHIVE_ZIP=$(dirname "$0")/photo_archive_1.3_pi-imgtank.zip
+#unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/*
 
+# use the github repo of the original author
+git clone https://github.com/f13dev/PHP-Photo-Archive.git /var/www/html/photo_archive
 # --- setup directories for the image-backup   -------------------------------
 
-rm -fr /var/www/html/photo_archive/images
-rm -fr /var/www/html/photo_archive/thumbs
-ln -s /data/videos /var/www/html/photo_archive/images
-ln -s /data/thumbnails /var/www/html/photo_archive/thumbs
+rm -fr /var/www/html/photo_archive/archive/images
+rm -fr /var/www/html/photo_archive/archive/mid
+rm -fr /var/www/html/photo_archive/archive/thumbs
+mkdir /var/www/html/photo_archive/archive/images
+ln -s /data/videos /var/www/html/photo_archive/archive/images/Videos
+ln -s /data/images /var/www/html/photo_archive/archive/images/images
+ln -s /data/thumbnails /var/www/html/photo_archive/archive/thumbs
 
 # --- setup directories for the image-upload   -------------------------------
 
@@ -45,7 +50,7 @@ chown -R www-data:www-data /data/uploads /data/tmp
 
 # --- setup status-page for the APC-cache and link phpsysinfo   --------------
 
-ln -s /usr/share/doc/php5-apcu/apc.php /var/www/html
+#ln -s /usr/share/doc/php-apcu/apc.php /var/www/html
 ln -s /usr/share/phpsysinfo /var/www/html/
 
 # --- fix ownership   --------------------------------------------------------
