@@ -30,10 +30,10 @@ apt-get -y install dnsmasq hostapd
 
 # --- configure hostname and /etc/hosts   -----------------------------------
 
-echo 'pi-imgtank' > /etc/hostname
+echo 'pitank' > /etc/hostname
 hostnamectl set-hostname pi-imgtank
 cat >> /etc/hosts <<EOF
-192.168.100.250 pi-imgtank
+192.168.100.1 pitank
 EOF
 
 # --- configure dnsmasq   ---------------------------------------------------
@@ -58,7 +58,7 @@ iface eth0 inet dhcp
 
 auto wlan0
 iface wlan0 inet static
-address   192.168.100.250
+address   192.168.100.1
 netmask   255.255.255.0
 network   192.168.100.0
 broadcast 192.168.100.255
@@ -71,7 +71,7 @@ DAEMON_CONF=/etc/hostapd.conf
 EOF
 
 cat > /etc/hostapd.conf <<EOF
-ssid=pi-imgtank
+ssid=pitank
 
 ctrl_interface=/var/run/hostapd
 interface=wlan0
@@ -85,7 +85,7 @@ wmm_enabled=1
 ht_capab=[SHORT-GI-20][SHORT-GI-40][HT40-]
 
 wpa=2
-wpa_passphrase=my+pi-imgtank!
+wpa_passphrase=pitank!
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP TKIP

@@ -31,7 +31,7 @@ ts_start = 0
 serial = spi(device=0, port=0)
 device = sh1106(serial)
 
-button = Button(14, pull_up=True, hold_time=2)
+button = Button(14, pull_up=True, hold_time=3)
 
 
 ####### Display variables ###############
@@ -79,14 +79,22 @@ def halt_end():
 def shutdown():
     print ("shutdown")
     i = 3
-    #while button.is_pressed and i>0:
-        
-#    check_call(['sudo', 'umount /data'])
-#    check_call(['sudo', 'hdparm -Y /dev/disk/by-partuuid/cea650ab-d65f-3241-87f8-188562cdb0fc'])
-#    check_call(['sudo', 'poweroff'])
-    os.system("umount /data")
-    os.system("hdparm -Y /dev/disk/by-partuuid/cea650ab-d65f-3241-87f8-188562cdb0fc")
-    os.system("halt -p &")
+    global status
+    global shutdowntimer
+    while button.is_pressed and i>0:
+        shutdowntimer = i
+        status = "shutdown"
+        print (i)
+        i=i-1
+        time.sleep(1)
+    if not button.is_pressed:
+        status = "ready"
+    else:
+        print ("shutdown now")
+        status = "Bye"
+        os.system("umount /data")
+        os.system("hdparm -Y /dev/disk/by-partuuid/cea650ab-d65f-3241-87f8-188562cdb0fc")
+        os.system("halt -p &")
 
 # -------------------------------------------------------------------------------------
 
@@ -153,30 +161,40 @@ def remains(total, done):
 
 def print_display():
     global status
+    global shutdowntimer
     while True:
-        #grepping values
-        now = datetime.datetime.now()
-        today_date = now.strftime("%d %b %y")
-        today_time = now.strftime("%H:%M:%S")
+        if status == 'shutdown':
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="black", fill="white")
+                draw.text((20, 30), "Shutdown in..."+str(shutdowntimer), fill="black")
+        elif status == 'Bye':
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="black", fill="black")
+                draw.text((55, 30), "Bye", fill="white")
+        else:
+            #grepping values
+            now = datetime.datetime.now()
+            today_date = now.strftime("%d %b %y")
+            today_time = now.strftime("%H:%M:%S")
 
-        # creating display content
-        with canvas(device) as draw:
-            draw.rectangle(device.bounding_box, outline="white", fill="black")
-            draw.rectangle([75,0,128,11], outline="white", fill="white")
-            draw.text((80, 1), today_time, fill="black")
-            # Status
-            draw.text((2, 2), status, fill="white")
-            draw.text((2, 50), disk_free('/data/'), fill="white")
+            # creating display content
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                draw.rectangle([75,0,128,11], outline="white", fill="white")
+                draw.text((80, 1), today_time, fill="black")
+                # Status
+                draw.text((2, 2), status, fill="white")
+                draw.text((2, 50), disk_free('/data/'), fill="white")
 
-            # Copy
-            if os.path.exists("/tmp/sdcard") and os.path.exists("/tmp/destination"):
-                source = size("/tmp/sdcard/")
-                destination = size("/tmp/destination/")
-                if source > 0:
-                    draw.text((2,20), "ETA:   " + remains(source,destination), fill="white")
-                    progress = destination / source * 100
-                    draw.text((2,35), "Copy: " +'{0:.2f}'.format(progress) + " %", fill="white")
-        time.sleep(1)
+                # Copy
+                if os.path.exists("/tmp/sdcard") and os.path.exists("/tmp/destination"):
+                    source = size("/tmp/sdcard/")
+                    destination = size("/tmp/destination/")
+                    if source > 0:
+                        draw.text((2,20), "ETA:  " + remains(source,destination), fill="white")
+                        progress = destination / source * 100
+                        draw.text((2,35), "Copy: " +'{0:.2f}'.format(progress) + " %", fill="white")
+        time.sleep(.5)
 
 
 def display_server():
@@ -225,6 +243,7 @@ def run_server():
 # -------------------------------------------------------------------------------------
 button.when_pressed = shutdown
 global status
-status = "Hi!"
+status = "Ready"
+shutdowntimer = 3
 display_server()
 run_server()
