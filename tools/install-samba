@@ -23,13 +23,13 @@ apt-get -y install samba
 
 cat > /etc/samba/smb.conf <<EOF
 [global]
-  workgroup = IMAGETANK
+  workgroup = Workgroup
   security = user
   map to guest = Bad User
   guest account = pi
-[images]
-  comment = Image backup
-  path = /data/images
+[videos]
+  comment = Video files
+  path = /data/videos
   browseable = yes
   writable = yes
   guest ok = yes

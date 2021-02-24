@@ -12,7 +12,7 @@
 
 # --- basic packages   ------------------------------------------------------
 
-apt-get -y install lighttpd php5-cgi php5-apcu php5-gd phpsysinfo
+apt-get -y install lighttpd php-cgi php-apcu php-gd phpsysinfo
 
 # --- configure php   --------------------------------------------------------
 
@@ -35,7 +35,7 @@ unzip "$PHOTO_ARCHIVE_ZIP" -d /var/www/html/ photo_archive/*
 
 rm -fr /var/www/html/photo_archive/images
 rm -fr /var/www/html/photo_archive/thumbs
-ln -s /data/images /var/www/html/photo_archive/images
+ln -s /data/videos /var/www/html/photo_archive/images
 ln -s /data/thumbnails /var/www/html/photo_archive/thumbs
 
 # --- setup directories for the image-upload   -------------------------------

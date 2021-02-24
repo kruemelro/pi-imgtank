@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 import socket
@@ -9,7 +9,6 @@ SOCKFILE = "/run/hat-server"
 
 # -------------------------------------------------------------------------------------
 
-    
 if len(sys.argv) == 1:
     sys.exit(3)
 else:
@@ -22,4 +21,5 @@ else:
             time.sleep(0.1)
     sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     sock.connect(SOCKFILE)
-    sock.sendall(sys.argv[1])
+    #sock.sendall(sys.argv[1])
+    sock.sendall(sys.argv[1].encode())

@@ -3,16 +3,12 @@
 # This script is triggered by an udev-rule in /etc/udev/rules.d/99-usbcopy.rules.
 # It copies all images from a SD-card to the hard-disk.
 #
-# Special features:
-#   - rename files to a unique ID: pii123456.*
-#   - copies to subdirs per day
-#   - only copies files not already copied
-#   - create thumbnails
+# This is a simple version of the copy-script, it just copies the files
+# as is to BACKUP_DIR (which defaults to /data/images). The script uses
+# rsync to only copy files which are new or modified.
 #
-# If DEBUG=1, messages go the the syslog. To view the messages, run
-#   sudo journalctl SYSLOG_IDENTIFIER=copy_img2
-#
-# Dependencies: GraphicsMagick
+# Note that you risk loosing data if you reset image-numbers in your camera
+# or if you use multiple cameras which create identical filenames.
 #
 # Author: Bernhard Bablok
 # License: GPL3
@@ -21,132 +17,60 @@
 #
 # ---------------------------------------------------------------------------
 
-source $(dirname "$0")/copy_mv_img2.inc
+DEBUG=1
+BACKUP_DIR="/data/videos"             # Target backup-directory
+DATA_OWNER="pi:pi"                    # uid:gid of data-owner
+datum=`date +%Y-%m-%d`
+# query udev argument
+device="$1"
+logger -t copy_img "checking: $1"
+#model=$(</sys/block/$device/device/model)
+#logger -t copy_img "model is: $model"
 
-# --- global settings   -----------------------------------------------------
+# we just ignore sda because this should be our os and/or target harddisk
+# change this heuristic to your needs!
+uuid=$( blkid /dev/$device -o value -s PARTUUID )
+[ "$uuid" = "cea650ab-d65f-3241-87f8-188562cdb0fc" ] && exit 0
 
-setDefaults() {
-  setGlobalDefaults
-}
+# change state of HAT: Action Start
+/usr/local/sbin/hatctl.py AS
 
-# --- check device   --------------------------------------------------------
+# create BACKUP_DIR
+# mkdir -p "$BACKUP_DIR"
 
-checkDevice() {
-  # query udev argument
-  device="$1"
-  msg "info: checking: $1"
-  model=$(</sys/block/$device/device/model)
-  msg "info: model is: $model"
+# create temporary mountdir, bail out on error
+mountdir=$(mktemp -d --tmpdir copy_img.XXXXXX)
+[ "$DEBUG" = "1" ] && logger -t copy_img "mountdir: $mountdir"
+[ -z "$mountdir" ] && exit 3
 
-  # we just ignore sda because this should be our os and/or target harddisk
-  # change this heuristic to your needs!
-  if [ "$device" = "sda" ]; then
-    msg "info: ignoring device sda (probably no SD-card)"
-    exit 0
-  fi
-}
+ln -s $mountdir /tmp/sdcard
 
-# --- prepare system   -----------------------------------------------------
+# now mount and copy files
+if mount "/dev/${device}" "$mountdir"; then
+  # build target dir
+  cardname=$( cat $mountdir/cardname.txt )
+  BACKUP_DIR="$BACKUP_DIR/$datum/$cardname"
+  mkdir -p "$BACKUP_DIR"
+  ln -s $BACKUP_DIR /tmp/destination
 
-prepareSystem() {
-  # change state of HAT: Action Start
-  /usr/local/sbin/hatctl.py AS
-
-  # create IMAGE_ROOT (if it does not exist)
-  if [ ! -d "$IMAGE_ROOT" ]; then
-    mkdir -p "$IMAGE_ROOT"
-    chown "$DATA_OWNER" "$IMAGE_ROOT"
-  fi
-
-  # create THUMB_ROOT (if it does not exist)
-  if [ ! -d "$THUMB_ROOT" ]; then
-    mkdir -p "$THUMB_ROOT"
-    chown "$DATA_OWNER" "$THUMB_ROOT"
-  fi
-
-  # create mount-directory for SD-card
-  mountdir="$DATA_ROOT/mnt_sd"
-  msg "mountdir: $mountdir"
-  mkdir -p "$mountdir"
-  
-  # try to mount SD-card (try /dev/sdx1 first, then fallback to /dev/sdx)
-  local sd_device="/dev/${device}1"
-  [ ! -b "$sd_device" ] && sd_device="/dev/${device}"
-  if ! mount "$sd_device" "$mountdir"; then
-    msg "error: could not mount $sd_device"
-    cleanup
-    exit 3
-  fi
-}
-
-# --- cleanup   -------------------------------------------------------------
-
-cleanup() {
-  # umount SD-card
-  msg "umounting mountdir: $mountdir"
-  grep -q "$mountdir" /etc/mtab && umount "$mountdir"
-
-  # change state of HAT: Action End
-  /usr/local/sbin/hatctl.py AE
-}
-
-# --- copy all images   ----------------------------------------------------
-
-copyFiles() {
-  # check if timestamp-file exists on SD-card. If not, create it
-  if [ ! -f "$mountdir/.last_img" ]; then
-    touch -d "01/01/1960" "$mountdir/.last_img"
-  fi
-
-  # find all files newer than .last_img on SD-card and copy it
-  local img srcStem srcStemNew targetStem ext
-  for img in $(find "$mountdir/DCIM" \
-                           -type f -newer "$mountdir/.last_img" | sort); do
-    msg "processing $img"
-
-    # check if we already copied a file with the same stem
-    local srcStemNew="${img%.*}"
-    if [ "$srcStem" != "$srcStemNew" ]; then
-      # make the new stem the current stem
-      srcStem="$srcStemNew"
-
-      # query date of current image and create target directory
-      local imgDate=$(getImageDate "$img")
-      if [ ! -d "$IMAGE_ROOT/$imgDate" ]; then
-        mkdir -p "$IMAGE_ROOT/$imgDate"
-        chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate"
-        mkdir -p "$THUMB_ROOT/$imgDate"
-        chown "$DATA_OWNER" "$THUMB_ROOT/$imgDate"
-      fi
-
-      # get stem of target filename
-      targetStem=$(nextNumber)
+#Yi-CAMs
+  if [ -d "$mountdir/DCIM/100MEDIA" ]; then
+    if [ "$DEBUG" = "1" ]; then
+#      rsync -va --no-owner --modify-window=1 "$mountdir"/DCIM/100MEDIA/* "$BACKUP_DIR" | \
+#          logger -t copy_img
+       cp "$mountdir"/DCIM/100MEDIA/*.mp4 "$BACKUP_DIR"
+    else
+      rsync -a --no-owner --modify-window=1 "$mountdir"/DCIM/100MEDIA/* "$BACKUP_DIR"
     fi
-
-    # now copy image
-    ext="${img##*.}"
-    ext="${ext,,}"        # convert to lowercase
-    msg "copying $img to $IMAGE_ROOT/$imgDate/$targetStem.$ext"
-    cp -a "$img" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
-    chmod -wx "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
-    chown "$DATA_OWNER" "$IMAGE_ROOT/$imgDate/$targetStem.$ext"
-
-    # create thumbnail
-    [ "$ext" = "jpg" ] && createThumb "$imgDate/$targetStem.$ext"
-  done
-
-  # save timestamp of last copied image
-  if [ -f "$img" ]; then
-    touch -r "$img" "$mountdir/.last_img"
-  else
-    msg "no images to copy"
+    chown -R "$DATA_OWNER" "$BACKUP_DIR"
   fi
-}
+  umount "$mountdir"
+else
+  logger -t copy_img "mount of ${device}1 failed!"
+fi
+rm /tmp/sdcard
+rm /tmp/destination
+rm -fr "$mountdir"
 
-# --- main program   ---------------------------------------------------------
-
-setDefaults
-checkDevice "$1"
-prepareSystem
-copyFiles
-cleanup
+# change state of HAT: Action End
+/usr/local/sbin/hatctl.py BE

@@ -10,4 +10,4 @@
 #
 # ---------------------------------------------------------------------------
 
-KERNEL=="sd?", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/bin/systemctl --no-block start copy_img2@$kernel.service"
+KERNEL=="sd?1", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/bin/systemctl --no-block start copy_img2@$kernel.service"
